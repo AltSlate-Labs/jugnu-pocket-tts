@@ -5,27 +5,29 @@ Living list of what comes after the running work. Plan: [plan.md](plan.md) · de
 
 ## Now — v0 family on the frozen Kyutai codec (in progress)
 
-- [ ] Arm A `scratch_v0` to 400k steps, Arm B `ftlang_v0` to 250k steps; benchmark every 25k steps.
-- [ ] Pick the teacher; distill Base (12L) and Lite (6L); benchmark all three on quality, cloning, latency/memory.
+- [x] Arm A `scratch_v0` ran to 400k (best at ~100–115k); Arm B `ftlang_v0` stopped at 115k; benchmarked every 25k steps.
+- [x] Teacher picked (115k scratch checkpoint, D21); Base (12L) and Lite (6L) distilling to 200k; benchmark all three on quality, cloning, latency/memory.
 - [ ] Remaining plan §8 tests: cross-language cloning, long text / names / numbers, 5 s vs 10 s references, Lite on CPU.
 - [ ] Human listening pass on the three preset voices (male, female, kid).
 
-## After v0 training — public repo (user request 2026-09-19)
+## Published 2026-09-21 — v0 release
 
 Create a **public repo `AltSlate-Labs/jugnu-pocket-tts`** (HF: `altslate/jugnu-pocket-tts`, gated) and push what we have: code, training recipe,
 samples, roadmap, license. **Only after the results are out** (final benchmarks for the v0 family) — not before.
-- [ ] Repo contents: `hindi-tts/` scripts + configs, recipe write-up (data filters, Hinglish gloss swap, alignment,
+- [x] Repo contents: `hindi-tts/` scripts + configs, recipe write-up (data filters, Hinglish gloss swap, alignment,
       tokenizer, two-arm training, eval protocol, codec gate), `decisions.md`, `experiments.md` (including the
       zero-encoder failure), `roadmap.md`, benchmark tables, audio samples.
-- [ ] GitHub Pages demo site from `docs/` (audio player grid with clean-voice samples, benchmarks, how-to, limitations, acknowledgements).
-- [ ] README per house style: status badges + embedded diagrams (pipeline, model family).
-- [ ] License: MIT for our code (matches upstream pocket-tts; keep their notice where their code is referenced);
+- [x] GitHub Pages demo site from `docs/` (audio player grid with clean-voice samples, benchmarks, how-to, limitations, acknowledgements).
+- [x] README per house style: status badges + embedded diagrams (pipeline, model family).
+- [x] License (code MIT; weights + tokenizer CC BY 4.0): MIT for our code (matches upstream pocket-tts; keep their notice where their code is referenced);
       `licenses.md` / NOTICE with CC BY 4.0 attributions — IndicVoices (AI4Bharat), HiFiTTS-2 (NVIDIA/LibriVox),
       HiACC (Singh, Singh & Kadyan 2025), Kyutai Pocket TTS / Mimi.
-- [ ] Decide before pushing (needs user): repo name and visibility of model weights; whether samples may use
+- [x] Decided with the user (D22–D28): repo name and visibility of model weights; whether samples may use
       the real-speaker presets (dataset adults, an 11-year-old from HiACC) or only a consented/synthetic-safe voice;
       whether to publish cloning-capable checkpoints at all vs preset-only voice states; re-read the accepted
       `kyutai/pocket-tts` terms for redistribution/use conditions; commit attribution rule for the public repo.
+- [x] Python API `jugnu_tts` (clone / speak / stream / save voices), pip-installable from the repo.
+- [ ] Replace the student weights with the final 200k checkpoints; re-benchmark; refresh page samples and tables.
 - [ ] Never push: dataset audio, Kyutai's gated weights, HF tokens, box address/keys.
 
 ## Next — own codec (deferred until v0 training completes; user decision 2026-09-19)

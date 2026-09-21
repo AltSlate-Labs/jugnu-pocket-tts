@@ -1,7 +1,7 @@
 #!/bin/bash
 # Benchmark the distilled students every 50k steps. Guidance is baked in, so they are sampled at cfg 1.0.
 T=~/hindi-tts
-declare -A GPU=([base12]=2 [lite6]=3)
+declare -A GPU=([base12]=3 [lite6]=3)  # Base's trainer keeps ~31 GB reserved on GPU 2, evals cannot share it
 while true; do
   for arm in base12 lite6; do
     for ck in $(ls $T/runs/${arm}_v0/checkpoint_*.pt 2>/dev/null); do

@@ -409,3 +409,24 @@ Archived teachers: `final_v0/scratch` (115k), `scratch_300k`, `_325k`, `_350k`, 
 - Tooling gotcha hit again: `pkill -f supervise_student` inside an SSH one-liner matched the SSH command itself
   (the pattern text appears in the command line), killing the session half-way. Multi-step process control now goes
   through a script file on the box.
+
+### E7 results so far — students match the teacher (2026-09-21)
+
+| Model | Step | Hindi IC WER / CER | Hinglish IC WER / CER | Speaker sim (Hi / Mix) | UTMOS (Hi / Mix) | silent / no_eos |
+| --- | --- | --- | --- | --- | --- | --- |
+| Teacher 24L (cfg 2.0) | 115k | 9.1% / 3.3% | 13.3% / 6.7% | 0.915 / 0.907 | 2.48 / 2.30 | 0 / 0 |
+| Lite 6L (cfg 1.0) | 50k | 8.4% / 3.2% | 12.1% / 5.2% | 0.916 / 0.911 | 2.57 / 2.41 | 0 / 1 |
+| Lite 6L (cfg 1.0) | 100k | 9.0% / 3.2% | 12.2% / 5.2% | 0.916 / 0.913 | 2.54 / 2.39 | 0 / 1 |
+| Base 12L (cfg 1.0) | 60k | 9.0% / 3.2% | 12.1% / 5.5% | 0.916 / 0.908 | 2.56 / 2.39 | 0 / 0 |
+
+Parameters (FlowLM only): teacher 316.0 M, Base 165.0 M, Lite 89.4 M. Base's 50k benchmark was lost: its trainer keeps
+~31 GB reserved on GPU 2, the eval OOM'd three times and the checkpoint rotated away; all student evals now run on
+GPU 3 and the 60k checkpoint was archived and benchmarked instead.
+
+Demo-page sample set (`release/gen_page_samples.py`): 3 models × 2 clean LibriVox readers (speaker 2104, also in
+the English training data; speaker 10644, unseen) × 9 sentences + a clean-vs-degraded reference pair. Every clip was
+transcribed before publishing: students are near-exact on Hindi, numbers and heavy code-switching cross-lingually;
+`reschedule` is mangled by all three models in every clip; the teacher is noisier than its students on these prompts.
+
+Release staging: box `~/hindi-tts/hf_release/{teacher-24l,base-12l,lite-6l}` (FlowLM-only + `assemble.py`); local
+repo `~/Workspace/jugnu-pocket-tts` (committed locally, not pushed) with README, NOTICE, figures and `docs/` page.

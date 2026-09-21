@@ -144,3 +144,31 @@ Plan: a single static page served from `docs/` — what it is, audio player grid
 Hinglish / English × Teacher / Base / Lite), benchmark table, how to run, limitations, responsible use,
 acknowledgements, links to the HF repo and the experiment log. Samples committed as small mono files; no dataset
 audio, no real-speaker clones.
+
+**D26. (2026-09-21) License audit, read at source.** Everything that shaped the released weights is CC BY 4.0:
+IndicVoices, HiFiTTS-2, `kyutai/hifitts2-aligned`, Kyutai's Pocket TTS / Mimi weights (plus Kyutai's prohibited-use
+gate, which we honour by not redistributing the codec and by gating our repo with the same text). Code: pocket-tts
+MIT. Tools that touch data or evaluation only: Vakyansh aligner MIT, IndicConformer MIT, Whisper MIT; WavLM-SV has no
+license tag and UTMOS is unverified — both evaluation-only, nothing derived from them is distributed. HiACC (CC BY
+4.0) was used for one test clip and is not published. Obligation that follows: attribution (done in the model card,
+README and NOTICE). Not a legal opinion; voice/personality rights are separate from these copyright licenses.
+
+**D27. (2026-09-21) v0 published (user go-ahead: "push everything we have ready right now, rest later").**
+Licenses: code MIT; model weights + tokenizer CC BY 4.0 (user confirmed). Kyutai's codec is not shipped.
+- Hugging Face: https://huggingface.co/altslate/jugnu-pocket-tts — gated (`auto`, Kyutai's prohibited-use text);
+  created private, uploaded, gate enabled, then made public. Contents: `teacher-24l/` (115k), `base-12l/` (90k),
+  `lite-6l/` (112.5k), each FlowLM-only + tokenizer + config + `assemble.py`; model card; 9 sample mp3s. Verified:
+  anonymous weight download returns 401; no `mimi.*` tensors uploaded.
+- GitHub: https://github.com/AltSlate-Labs/jugnu-pocket-tts — public, 3 commits as rajpdus, no Claude attribution.
+- Demo page: https://altslate-labs.github.io/jugnu-pocket-tts/ — GitHub Pages from `docs/`, live and verified.
+Both student packages were tested through the standard `pocket-tts` runtime on CPU before upload (Lite 3.3× real
+time, Base 1.5×, 16 threads). Later: replace students with the 200k weights, fill the missing benchmarks.
+
+**D28. (2026-09-21) Python API `jugnu_tts` added to the public repo** (user request). `Jugnu(model)`, `.clone(path) →
+Voice`, `.speak(text, voice, out=None)`, `.stream(text, voice)`, `Voice.save()` / `.load_voice()`. It downloads our
+weights and Kyutai's codec with the user's own access, assembles them once into `~/.cache/jugnu_tts`, and wraps the
+standard PyPI `pocket-tts` runtime (tested against 3.1.0). Verified from a fresh virtualenv with
+`pip install git+https://github.com/AltSlate-Labs/jugnu-pocket-tts`: Lite on 16 server-CPU threads gives 4.3 s of
+speech in 1.3 s, first streamed chunk in 0.10 s, exact IndicConformer transcript. That fresh-install test caught one
+bug (wav writing imported `sphn`, which is not a PyPI `pocket-tts` dependency → now uses the standard library).
+Documented in README, the HF model card and the demo page.
