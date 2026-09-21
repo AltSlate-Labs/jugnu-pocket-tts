@@ -33,6 +33,8 @@ extra_gated_fields:
 
 # Jugnu Pocket TTS (v0) — Hindi · English · Hinglish
 
+**[▶ Listen to samples](https://altslate-labs.github.io/jugnu-pocket-tts/)** · [Code, recipe and lab notes](https://github.com/AltSlate-Labs/jugnu-pocket-tts)
+
 A family of three small text-to-speech models that speak **Hindi, English and code-switched Hinglish** and clone a
 voice from a few seconds of reference audio. Trained by [altslate labs](https://huggingface.co/altslate) with
 [Kyutai's Pocket TTS / CALM recipe](https://github.com/kyutai-labs/pocket-tts).
@@ -84,8 +86,11 @@ similarity is WavLM-base-plus-sv cosine (English-trained, unvalidated on Hindi).
 | Model | Hindi WER / CER | Hinglish WER / CER | Speaker sim | UTMOS (noisy prompts) |
 | --- | --- | --- | --- | --- |
 | Teacher 24L (115k steps, cfg 2.0) | 9.1% / 3.3% | 13.3% / 6.7% | 0.91 | 2.5 / 2.3 |
-| Base 12L | _pending_ | _pending_ | _pending_ | _pending_ |
-| Lite 6L | _pending_ | _pending_ | _pending_ | _pending_ |
+| Base 12L (90k distillation steps; benchmarked at 60k) | 9.0% / 3.2% | 12.1% / 5.5% | 0.91 | 2.6 / 2.4 |
+| Lite 6L (112.5k distillation steps; benchmarked at 100k) | 9.0% / 3.2% | 12.2% / 5.2% | 0.91 | 2.5 / 2.4 |
+
+Both students are still training to 200k steps; final weights will replace these. On a 16-thread CPU in the standard
+runtime, Lite runs at 3.3× real time and Base at 1.5×.
 
 Not yet measured: English WER, cross-language cloning at scale, long text / names / numbers, latency and CPU
 real-time factor, any human listening test.
@@ -105,6 +110,36 @@ real-time factor, any human listening test.
 - **Students:** depth + guidance distillation from that teacher (Kyutai's `depth_distill` recipe; 12 and 6 layers).
 - Code, configs, the full experiment log (including what went wrong) and the roadmap:
   https://github.com/AltSlate-Labs/jugnu-pocket-tts.
+
+## Training details
+
+| | Teacher (24L) | Base (12L) | Lite (6L) |
+| --- | --- | --- | --- |
+| Parameters (generator only) | 316 M | 165 M | 89 M |
+| Initialisation | random | teacher head + teacher layers 0–5, 18–23 | teacher head + teacher layers 0–2, 21–23 |
+| Objective | LSD flow head (1-step sampling) + end-of-speech loss 0.1 | match the teacher's backbone output (MSE), guidance 2.0 baked in | same as Base |
+| Learning rate / schedule | 2e-4, cosine, 1k warm-up | 4e-4, cosine, 1k warm-up | 4e-4, cosine, 1k warm-up |
+| Effective batch | 64 utterances (16 × 2 GPUs × 2 accumulation) | 64 (32 × 1 GPU × 2) | 64 (32 × 1 GPU × 2) |
+| Conditioning dropout (text / voice) | 0.2 / 0.2 | none | none |
+| Weight EMA | 0.999 | 0.9999 | 0.9999 |
+| Steps | 400k run; **115k released** | 200k planned (90k in this release) | 200k planned (112.5k in this release) |
+| Speed on RTX PRO 4500 Blackwell 32 GB | ~3.0 steps/s on 2 GPUs | ~2.5 steps/s on 1 GPU | ~3.2 steps/s on 1 GPU |
+| Wall-clock | ~11 h to 115k (~37 h to 400k) | ~22 h to 200k | ~17 h to 200k |
+| CPU speed (16 threads, standard runtime) | — | 1.5× real time | 3.3× real time |
+
+**Shared:** Kyutai's Mimi codec, frozen (24 kHz, 12.5 frames/s, 32-dim continuous latents, precomputed once);
+d_model 1024, 16 heads, 6-layer flow head; SentencePiece BPE with 4,000 tokens over Devanagari + Latin; AdamW
+(weight decay 0.1, betas 0.9 / 0.95, gradient clip 1.0); utterances up to 30 s; the voice prompt is the part of the
+same utterance before a random word boundary (max 5 s), the target is the rest.
+
+**Data:** 451k IndicVoices Hindi utterances → 193k kept (447 h, 2,143 speakers) after requiring the dataset's
+"excellent" rating, none of its 17 problem flags, no non-speech tags, 2–30 s and ≥ 3 words; 35% carry English
+glosses, half of which are trained in Latin script. Plus 66k HiFiTTS-2 English utterances (200 h). 20 validation and
+20 test speakers held out before anything was trained. Hindi word timestamps from a wav2vec2 CTC aligner (190,126 of
+190,132 aligned); English timestamps from Kyutai's published alignments.
+
+**Before every launch:** `training/check_codec.py` encodes and decodes held-out clips and refuses to start unless
+the latents are non-degenerate and the reconstruction still transcribes (English drift 1%, Hindi 24% with this codec).
 
 ## Limitations
 
@@ -137,5 +172,5 @@ This work stands on other people's:
 
 ## License
 
-Our weights, tokenizer and configs: **CC BY 4.0**. Kyutai's codec is fetched from their repo under their terms.
+Our weights, tokenizer and configs: **CC BY 4.0**. Code: MIT (on GitHub). Kyutai's codec is fetched from their repo under their terms.
 Please credit "Jugnu Pocket TTS, altslate labs" and the projects above.
