@@ -134,7 +134,7 @@ voice.save("me.safetensors")                  # clone once, reuse forever
 voice = tts.load_voice("me.safetensors")
 
 for chunk in tts.stream("मैंने अपना laptop restart किया, फिर software update install किया", voice):
-    play(chunk)                               # first chunk arrives in ~0.1 s on a CPU
+    play(chunk)                               # first chunk in ~0.1 s (16 server-CPU threads)
 ```
 
 | Call | What it does |
@@ -145,7 +145,7 @@ for chunk in tts.stream("मैंने अपना laptop restart किय�
 | `tts.stream(text, voice)` | Yields audio chunks as they are generated. |
 | `voice.save(path)` | Saves the cloned voice so the reference clip is no longer needed. |
 
-Measured on a 16-thread CPU with Lite: 4.3 s of speech in 1.3 s; first streamed chunk after 0.10 s. Write Hindi in
+Measured with Lite on 16 threads of a server CPU (AMD EPYC-class, not a laptop): 4.3 s of speech in 1.3 s; first streamed chunk after 0.10 s. Write Hindi in
 Devanagari, English in Latin script, numbers as words (digits trigger a warning). **Clone a voice only with the
 speaker's explicit, lawful consent.** A runnable example is in [`examples/quickstart.py`](examples/quickstart.py).
 
