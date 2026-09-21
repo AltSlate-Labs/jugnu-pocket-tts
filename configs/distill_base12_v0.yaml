@@ -1,0 +1,41 @@
+# Base: 12-layer student (our extension; upstream only validated 6L), depth + CFG distillation from our own 24L scratch teacher (upstream depth_distill.yaml).
+# Student = the teacher's architecture with num_layers overridden; head and non-backbone weights are copied from
+# the teacher, backbone seeded from its bottom+top layers. One GPU, batch 64.
+model_config: /home/ubuntu/hindi-tts/configs/hinglish_24l.yaml
+model_overrides:
+  flow_lm.transformer.num_layers: 12
+start_from_pretrained: false
+distill_cfg_coef: 2.0
+distill_teacher_config: /home/ubuntu/hindi-tts/configs/hinglish_24l.yaml
+distill_teacher_weights: /home/ubuntu/hindi-tts/final_v0/scratch/checkpoint_00115000.pt  # best-WER archived teacher (D21); 400k drifted to 15/20% WER
+
+data:
+  train_jsonl: /home/ubuntu/hindi-tts/data/v0/train_aligned.jsonl
+  valid_jsonl: /home/ubuntu/hindi-tts/data/v0/valid_aligned.jsonl
+
+flow:
+  type: lsd
+  kwargs: {}
+
+text_dropout: 0.0
+voice_dropout: 0.0
+
+optim:
+  lr: 4e-4
+  schedule: cosine
+  warmup_steps: 1000
+
+run_dir: /home/ubuntu/hindi-tts/runs/base12_v0
+batch_size: 32  # 64 OOMs a 32 GB card in validation (raw-audio Mimi encode at full batch)
+grad_accum_steps: 2
+max_steps: 200000
+ema_decay: 0.9999
+log_freq: 50
+valid_freq: 2500
+ckpt_freq: 2500
+num_ckpt_keep: 4
+sample_freq: 10000
+sample_sentences:
+  - "आज मौसम बहुत अच्छा है और हम सब बाहर घूमने जा रहे हैं"
+  - "कल की meeting तीन बजे reschedule कर देना और updated link मुझे भेज देना"
+  - "The quick brown fox jumps over the lazy dog."

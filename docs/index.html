@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jugnu Pocket TTS — Hindi, English and Hinglish speech</title>
+<meta name="description" content="Listen to Jugnu Pocket TTS: three small open models that speak Hindi, English and Hinglish in a cloned voice.">
+<style>
+  :root {
+    --bg: #fbfaf7; --surface: #ffffff; --ink: #16150f; --ink-2: #55534a; --ink-3: #85827a;
+    --line: #e6e3da; --accent: #b4540a; --accent-soft: #fbeedd; --ok: #1d7a3e; --warn: #9a5b00;
+    --radius: 12px; --maxw: 1080px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #14130f; --surface: #1d1c17; --ink: #f4f2ea; --ink-2: #c2bfb3; --ink-3: #8d8a7f;
+            --line: #33312a; --accent: #f0a04b; --accent-soft: #33261a; --ok: #6fcf8f; --warn: #f0b95a; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Noto Sans", "Noto Sans Devanagari", sans-serif; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  header { padding: 64px 0 36px; border-bottom: 1px solid var(--line); }
+  .eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
+  h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.05; margin: 0 0 16px; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  .lede { font-size: clamp(17px, 2.2vw, 20px); color: var(--ink-2); max-width: 62ch; margin: 0 0 24px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn { display: inline-block; padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
+         background: var(--surface); color: var(--ink); text-decoration: none; font-weight: 600; font-size: 15px; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .note { margin-top: 22px; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft);
+          border-radius: 0 var(--radius) var(--radius) 0; color: var(--ink-2); font-size: 15px; max-width: 78ch; }
+  section { padding: 48px 0; border-bottom: 1px solid var(--line); }
+  h2 { font-size: 26px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .sub { color: var(--ink-2); margin: 0 0 24px; max-width: 72ch; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+  .tab { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+         color: var(--ink-2); font: inherit; font-size: 14px; cursor: pointer; }
+  .tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .refs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+  .card h3 { margin: 0 0 4px; font-size: 15px; }
+  .card p { margin: 0 0 10px; font-size: 14px; color: var(--ink-2); }
+  audio { width: 100%; height: 36px; display: block; }
+  .row { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+  .row .text { font-size: 18px; margin: 0 0 4px; line-height: 1.5; }
+  .row .kind { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 12px; }
+  .players { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .player .lbl { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-2); margin-bottom: 6px; }
+  .player .lbl b { color: var(--ink); }
+  .heard { font-size: 13px; color: var(--ink-3); margin: 6px 0 0; line-height: 1.45; }
+  .heard mark { background: none; color: var(--warn); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { font-size: 13px; color: var(--ink-3); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+  figure { margin: 22px 0 0; }
+  figure img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius); background: #fcfcfb; }
+  figcaption { font-size: 14px; color: var(--ink-2); margin-top: 8px; max-width: 80ch; }
+  pre { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px;
+        overflow-x: auto; font-size: 13.5px; line-height: 1.55; }
+  ul.tight { padding-left: 20px; margin: 0; } ul.tight li { margin-bottom: 8px; color: var(--ink-2); }
+  ul.tight li b { color: var(--ink); }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; }
+  footer { padding: 36px 0 64px; color: var(--ink-3); font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <p class="eyebrow">altslate labs · v0 research preview</p>
+    <h1>Jugnu <span>Pocket TTS</span></h1>
+    <p class="lede">Three small open models that speak Hindi, English and Hinglish — in one sentence if you like —
+      in a voice cloned from a few seconds of audio. The smallest has 6 layers and 89 million parameters.</p>
+    <div class="cta">
+      <a class="btn primary" href="#listen">Listen</a>
+      <a class="btn" href="https://huggingface.co/altslate/jugnu-pocket-tts">Weights on Hugging Face</a>
+      <a class="btn" href="https://github.com/AltSlate-Labs/jugnu-pocket-tts">Code, recipe and lab notes</a>
+    </div>
+    <p class="note">Built on <a href="https://github.com/kyutai-labs/pocket-tts">Kyutai's Pocket TTS</a> recipe and codec.
+      A community-trained model, not an official Kyutai release. Every clip on this page is synthetic speech in the
+      voice of a public-domain LibriVox audiobook reader; no one else's voice is cloned here.</p>
+  </div>
+</header>
+
+<main>
+<section id="listen">
+  <div class="wrap">
+    <h2>Listen</h2>
+    <p class="sub">Same text, same reference voice, three model sizes. Under each player is what a Hindi speech
+      recogniser heard, so you can see the mistakes as well as hear them. Neither reader ever spoke Hindi in our
+      training data: the Hindi and Hinglish here are cross-language clones of an English voice.</p>
+    <div class="tabs" id="voiceTabs" role="group" aria-label="Reference voice"></div>
+    <div class="refs" id="refs"></div>
+    <div id="rows"></div>
+  </div>
+</section>
+
+<section id="reference">
+  <div class="wrap">
+    <h2>The reference clip sets the sound</h2>
+    <p class="sub">A cloning model copies everything about its prompt, including the microphone. Below, the same
+      reader, first as recorded, then squeezed to telephone bandwidth with added noise. This is the most useful thing we
+      learned: give the model a clean reference.</p>
+    <div id="degraded"></div>
+    <figure><img src="figures/reference_quality.png" alt="Bar chart: generated Hindi speech scores UTMOS 1.89 and 2.44 with noisy field-recording references and 3.65 with a clean studio reference." loading="lazy">
+      <figcaption>Same teacher checkpoint, same sentences. The noisy references are the kind of phone recordings our
+        benchmark uses; the recordings themselves score 2.0.</figcaption></figure>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <h2>How good is it?</h2>
+    <p class="sub">Twenty speakers the models never trained on, 150 Hindi and 150 Hinglish sentences, voice prompt taken
+      from a different utterance. Word error rate is measured by AI4Bharat's IndicConformer. The same recogniser scores
+      14.5% and 15.7% on the real recordings of these sentences, so 9–13% means "as clear as this judge can tell".</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Model</th><th class="num">Parameters</th><th class="num">Hindi WER</th><th class="num">Hinglish WER</th><th class="num">Speaker similarity</th></tr></thead>
+      <tbody>
+        <tr><td>Teacher, 24 layers</td><td class="num">316 M</td><td class="num">9.1%</td><td class="num">13.3%</td><td class="num">0.91</td></tr>
+        <tr><td>Base, 12 layers <span style="color:var(--ink-3)">(60k steps, still training)</span></td><td class="num">165 M</td><td class="num">9.0%</td><td class="num">12.1%</td><td class="num">0.91</td></tr>
+        <tr><td>Lite, 6 layers <span style="color:var(--ink-3)">(100k steps, still training)</span></td><td class="num">89 M</td><td class="num">9.0%</td><td class="num">12.2%</td><td class="num">0.91</td></tr>
+      </tbody></table></div>
+    <figure><img src="figures/wer_vs_steps.png" alt="Line charts of word error rate against training steps for Hindi and Hinglish. The from-scratch teacher is best near 100 thousand steps and degrades to 14 and 19 percent by 400 thousand." loading="lazy">
+      <figcaption>Training longer made the teacher worse on our noisy corpus, so we release the 115k-step checkpoint.
+        Not yet measured: English error rate, cross-language cloning at scale, names and numbers, CPU speed, and any
+        human listening test.</figcaption></figure>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap two">
+    <div>
+      <h2>How it was made</h2>
+      <ul class="tight">
+        <li><b>647 hours of speech.</b> 447 h of quality-filtered Hindi from IndicVoices (2,143 speakers, phone
+          recordings) and 200 h of English audiobooks from HiFiTTS-2.</li>
+        <li><b>Hinglish without a Hinglish corpus.</b> IndicVoices transcripts mark borrowed words as
+          <code>किलो [Kilo]</code>. For half of those sentences we trained on the Latin spelling.</li>
+        <li><b>A teacher from random weights,</b> then two students distilled from it with guidance baked in, following
+          Kyutai's published recipe.</li>
+        <li><b>The mistakes are in the log</b>: 63,000 wasted steps on a zeroed codec, a crashed distillation, and a
+          teacher that got worse with more training. <a href="https://github.com/AltSlate-Labs/jugnu-pocket-tts/blob/main/notes/experiments.md">Read the experiment log</a>.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Run it</h2>
+      <pre>pip install pocket-tts huggingface_hub safetensors pyyaml
+huggingface-cli login
+huggingface-cli download altslate/jugnu-pocket-tts \
+    --include "lite-6l/*" --local-dir jugnu
+python jugnu/lite-6l/assemble.py
+pocket-tts generate \
+    --config jugnu/lite-6l/config.local.yaml \
+    --voice my_consented_voice.wav \
+    --text "आपका order confirm हो गया है"</pre>
+      <p class="sub" style="margin:10px 0 0">Accept the terms on our Hugging Face page and on
+        <a href="https://huggingface.co/kyutai/pocket-tts">Kyutai's</a> first: their codec is fetched with your own
+        account. Write Hindi in Devanagari, English in Latin script, and numbers as words.</p>
+    </div>
+  </div>
+</section>
+
+<section id="limits">
+  <div class="wrap two">
+    <div>
+      <h2>What it cannot do yet</h2>
+      <ul class="tight">
+        <li>Hindi sounds duller than English: most Hindi training audio is 16 kHz, and the codec loses more detail on it.</li>
+        <li>No children's voices, no Indian-accented English and little expressive speech in training.</li>
+        <li>Hinglish is harder than Hindi, and some loanwords are mangled. Listen for <i>reschedule</i> above.</li>
+        <li>Romanized Hindi (<code>kal meeting hai</code>) is not supported.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Use it responsibly</h2>
+      <ul class="tight">
+        <li>Clone a voice only with the speaker's <b>explicit, lawful consent</b>.</li>
+        <li>No impersonation, no fraud, no presenting generated audio as a real recording.</li>
+        <li>The weights are gated behind the same prohibited-use terms Kyutai uses.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="thanks">
+  <div class="wrap">
+    <h2>Standing on other people's work</h2>
+    <p class="sub" style="margin-bottom:0"><a href="https://kyutai.org">Kyutai</a> for Pocket TTS, the Mimi codec, the CALM recipe and
+      open training code. <a href="https://ai4bharat.iitm.ac.in">AI4Bharat</a> for IndicVoices and IndicConformer. NVIDIA and the
+      LibriVox volunteers for HiFiTTS-2. Harveen Chadha and Vakyansh for the Hindi aligner. Singh, Singh and Kadyan for
+      HiACC. OpenAI Whisper, Microsoft WavLM and UTMOS for evaluation.
+      <a href="https://github.com/AltSlate-Labs/jugnu-pocket-tts/blob/main/NOTICE.md">Full list with licenses</a>.</p>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">Jugnu Pocket TTS · altslate labs · code MIT, weights CC BY 4.0 with use terms</div></footer>
+
+<script>
+const MODELS = [["lite-6l", "Lite", "6 layers · 89M"], ["base-12l", "Base", "12 layers · 165M"], ["teacher-24l", "Teacher", "24 layers · 316M"]];
+const VOICES = [["reader_low", "Reader A", "lower-pitched LibriVox reader; this voice also appears in the English training data"],
+                ["reader_high", "Reader B", "higher-pitched LibriVox reader; never seen in training"]];
+const KINDS = {hi1: "Hindi", hi2: "Hindi", hi_long: "Hindi · long sentence", hi_num: "Hindi · time and numbers",
+               mix1: "Hinglish", mix2: "Hinglish", mix_heavy: "Hinglish · heavy code-switching", en1: "English", en2: "English"};
+const ORDER = ["hi1", "mix2", "mix_heavy", "hi_num", "hi_long", "mix1", "hi2", "en1", "en2"];
+let voice = "reader_low", DATA = null;
+
+const el = (tag, attrs = {}, kids = []) => { const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === "text" ? n.textContent = v : n.setAttribute(k, v);
+  kids.forEach(k => n.append(k)); return n; };
+const audio = src => el("audio", {controls: "", preload: "none", src});
+
+function player(model, label, size, v, key) {
+  const heard = DATA.heard[`${model}/${v}__${key}`];
+  const kids = [el("div", {class: "lbl"}, [el("b", {text: label}), el("span", {text: size})]), audio(`audio/${model}/${v}__${key}.mp3`)];
+  if (heard) kids.push(el("p", {class: "heard", text: "Recogniser heard: " + heard}));
+  return el("div", {class: "player"}, kids);
+}
+function render() {
+  const tabs = document.getElementById("voiceTabs"); tabs.replaceChildren(...VOICES.map(([id, name]) => {
+    const b = el("button", {class: "tab", "aria-pressed": String(id === voice), text: name}); b.onclick = () => { voice = id; render(); }; return b; }));
+  const [, name, desc] = VOICES.find(v => v[0] === voice);
+  document.getElementById("refs").replaceChildren(el("div", {class: "card"}, [el("h3", {text: name + " — the real reference clip (English)"}),
+    el("p", {text: "10 seconds of a " + desc + "."}), audio(`audio/voices/${voice}.mp3`)]));
+  document.getElementById("rows").replaceChildren(...ORDER.map(key => el("div", {class: "row"}, [
+    el("p", {class: "kind", text: KINDS[key]}), el("p", {class: "text", lang: key.startsWith("en") ? "en" : "hi", text: DATA.sentences[key]}),
+    el("div", {class: "players"}, MODELS.map(([m, l, s]) => player(m, l, s, voice, key)))])));
+  document.getElementById("degraded").replaceChildren(
+    el("div", {class: "refs"}, [
+      el("div", {class: "card"}, [el("h3", {text: "Clean reference"}), el("p", {text: "Reader A as recorded."}), audio("audio/voices/reader_low.mp3")]),
+      el("div", {class: "card"}, [el("h3", {text: "Degraded reference"}), el("p", {text: "The same clip at telephone bandwidth with noise added."}), audio("audio/voices/reader_low_degraded.mp3")])]),
+    ...["hi1", "mix1"].map(key => el("div", {class: "row"}, [
+      el("p", {class: "kind", text: KINDS[key] + " · Lite model"}), el("p", {class: "text", lang: "hi", text: DATA.sentences[key]}),
+      el("div", {class: "players"}, [player("lite-6l", "From the clean reference", "", "reader_low", key),
+                                     player("lite-6l", "From the degraded reference", "", "reader_low_degraded", key)])])));
+}
+fetch("audio/data.json").then(r => r.json()).then(d => { DATA = d; render(); });
+</script>
+</body>
+</html>
