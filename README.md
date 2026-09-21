@@ -113,7 +113,43 @@ glosses, half of which are trained in Latin script. Plus 66k HiFiTTS-2 English u
 **Before every launch:** `training/check_codec.py` encodes and decodes held-out clips and refuses to start unless
 the latents are non-degenerate and the reconstruction still transcribes (English drift 1%, Hindi 24% with this codec).
 
-## Run it
+## Python API
+
+```bash
+pip install git+https://github.com/AltSlate-Labs/jugnu-pocket-tts
+huggingface-cli login   # after accepting the terms of altslate/jugnu-pocket-tts and kyutai/pocket-tts
+```
+
+```python
+from jugnu_tts import Jugnu
+
+tts = Jugnu("lite")                           # "lite" | "base" | "teacher"; downloads once, then cached
+voice = tts.clone("my_consented_voice.wav")   # 5–15 s of clean speech
+
+tts.speak("आपका order confirm हो गया है और delivery कल शाम तक हो जाएगी", voice, out="hello.wav")
+
+audio = tts.speak("Hello, how can I help you today?", voice)   # float32 numpy array at tts.sample_rate (24 kHz)
+
+voice.save("me.safetensors")                  # clone once, reuse forever
+voice = tts.load_voice("me.safetensors")
+
+for chunk in tts.stream("मैंने अपना laptop restart किया, फिर software update install किया", voice):
+    play(chunk)                               # first chunk arrives in ~0.1 s on a CPU
+```
+
+| Call | What it does |
+| --- | --- |
+| `Jugnu(model="lite", temperature=None)` | Loads a model. First use downloads our weights and Kyutai's codec (with your access) and assembles them into `~/.cache/jugnu_tts`; later loads take under a second. |
+| `tts.clone(path) -> Voice` | Clones a voice from an audio file, or loads a saved `Voice`. The output copies the clip's acoustics, so use a clean recording. |
+| `tts.speak(text, voice, out=None) -> np.ndarray` | Synthesises text; optionally writes a wav. |
+| `tts.stream(text, voice)` | Yields audio chunks as they are generated. |
+| `voice.save(path)` | Saves the cloned voice so the reference clip is no longer needed. |
+
+Measured on a 16-thread CPU with Lite: 4.3 s of speech in 1.3 s; first streamed chunk after 0.10 s. Write Hindi in
+Devanagari, English in Latin script, numbers as words (digits trigger a warning). **Clone a voice only with the
+speaker's explicit, lawful consent.** A runnable example is in [`examples/quickstart.py`](examples/quickstart.py).
+
+## Run it from the command line
 
 Weights and instructions are on [Hugging Face](https://huggingface.co/altslate/jugnu-pocket-tts). Kyutai's codec is
 not redistributed: `release/assemble.py` fetches it with your own account after you accept
@@ -128,6 +164,8 @@ Everything here runs inside a checkout of `kyutai-labs/pocket-tts` pinned at `d9
 | `training/` | data extraction + filtering, speaker-disjoint splits, Hinglish swap, codec gate, launch + supervisor scripts |
 | `configs/` | teacher (scratch and from-English) and the two distillation configs |
 | `eval/` | held-out Hindi/Hinglish benchmark, IndicConformer scoring, demo generation, checkpoint watchers |
+| `jugnu_tts/` | the Python API (`pip install git+…`) |
+| `examples/` | quickstart script |
 | `release/` | FlowLM-only export, `assemble.py`, model card |
 | `notes/` | the plan, every decision with its reason, the full experiment log, the roadmap |
 | `docs/` | the demo page |

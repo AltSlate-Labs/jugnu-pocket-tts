@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jugnu-tts"
+version = "0.1.0"
+description = "Python API for Jugnu Pocket TTS: Hindi, English and Hinglish speech in a cloned voice"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = ["pocket-tts", "huggingface_hub", "safetensors", "pyyaml", "numpy"]
+
+[project.urls]
+Homepage = "https://altslate-labs.github.io/jugnu-pocket-tts/"
+Repository = "https://github.com/AltSlate-Labs/jugnu-pocket-tts"
+
+[tool.setuptools]
+packages = ["jugnu_tts"]

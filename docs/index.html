@@ -149,16 +149,16 @@
     </div>
     <div>
       <h2>Run it</h2>
-      <pre>pip install pocket-tts huggingface_hub safetensors pyyaml
-huggingface-cli login
-huggingface-cli download altslate/jugnu-pocket-tts \
-    --include "lite-6l/*" --local-dir jugnu
-python jugnu/lite-6l/assemble.py
-pocket-tts generate \
-    --config jugnu/lite-6l/config.local.yaml \
-    --voice my_consented_voice.wav \
-    --text "आपका order confirm हो गया है"</pre>
-      <p class="sub" style="margin:10px 0 0">Accept the terms on our Hugging Face page and on
+      <pre>pip install git+https://github.com/AltSlate-Labs/jugnu-pocket-tts
+huggingface-cli login</pre>
+      <pre>from jugnu_tts import Jugnu
+
+tts = Jugnu("lite")          # or "base"
+voice = tts.clone("my_consented_voice.wav")
+tts.speak("आपका order confirm हो गया है",
+          voice, out="hello.wav")
+voice.save("me.safetensors")  # reuse later</pre>
+      <p class="sub" style="margin:10px 0 0">About 3× faster than real time on a laptop-class CPU. Accept the terms on our Hugging Face page and on
         <a href="https://huggingface.co/kyutai/pocket-tts">Kyutai's</a> first: their codec is fetched with your own
         account. Write Hindi in Devanagari, English in Latin script, and numbers as words.</p>
     </div>

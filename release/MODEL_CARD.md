@@ -53,6 +53,24 @@ This is a **community-trained model. It is not an official Kyutai release** and 
 
 ## How to run
 
+**Python API** (downloads, assembles and caches everything for you):
+
+```bash
+pip install git+https://github.com/AltSlate-Labs/jugnu-pocket-tts
+huggingface-cli login   # after accepting the terms of this repo and of kyutai/pocket-tts
+```
+
+```python
+from jugnu_tts import Jugnu
+
+tts = Jugnu("lite")                           # or "base"
+voice = tts.clone("my_consented_voice.wav")   # 5–15 s of clean speech
+tts.speak("आपका order confirm हो गया है और delivery कल शाम तक हो जाएगी", voice, out="hello.wav")
+voice.save("me.safetensors")                  # reuse later with tts.load_voice(...)
+```
+
+**Command line:**
+
 The audio codec (Mimi) is Kyutai's and is **not redistributed here**. `assemble.py` fetches it with your own account.
 
 1. Accept the terms of this repo and of [`kyutai/pocket-tts`](https://huggingface.co/kyutai/pocket-tts).
