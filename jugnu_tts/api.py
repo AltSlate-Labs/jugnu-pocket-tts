@@ -1,5 +1,6 @@
 import re
 import warnings
+import wave
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -104,15 +105,22 @@ class Jugnu:
         """Synthesise `text` in `voice`. Returns mono float32 audio at `sample_rate`; also writes a wav if `out` is set."""
         audio = self._tts.generate_audio(voice.state, _check(text)).numpy()
         if out is not None:
-            import sphn
-
-            sphn.write_wav(str(out), audio, self.sample_rate)
+            _write_wav(out, audio, self.sample_rate)
         return audio
 
     def stream(self, text: str, voice: Voice) -> Iterator[np.ndarray]:
         """Yield audio chunks as they are generated, for low-latency playback."""
         for chunk in self._tts.generate_audio_stream(voice.state, _check(text)):
             yield chunk.numpy()
+
+
+def _write_wav(path: str | Path, audio: np.ndarray, sample_rate: int):
+    pcm = (np.clip(audio, -1.0, 1.0) * 32767).astype("<i2")
+    with wave.open(str(path), "wb") as f:
+        f.setnchannels(1)
+        f.setsampwidth(2)
+        f.setframerate(sample_rate)
+        f.writeframes(pcm.tobytes())
 
 
 def _check(text: str) -> str:
