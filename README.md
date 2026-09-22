@@ -191,10 +191,51 @@ These models can imitate a voice from a short recording. Clone a voice only with
 consent**. No impersonation, fraud, or passing generated audio off as a real recording. The weights carry the same
 prohibited-use terms as Kyutai's. Every sample we publish uses public-domain LibriVox reader voices only.
 
-## Roadmap
+## Future work
 
-Next: our own codec trained on Indian speech, 48 kHz Hindi data, recorded clause-level Hinglish and Indian English,
-consented studio voices, and the missing benchmarks. Details in [notes/roadmap.md](notes/roadmap.md).
+v0 proved the recipe works for Hindi and Hinglish. What it did not do is sound as good as the English models it is
+built on, and the reasons are known. In rough order of expected payoff:
+
+**1. Our own audio codec, trained on Indian speech.** Every model here runs on Kyutai's Mimi codec, frozen. It was
+trained on English-dominated audio, and we measured the cost: after a round trip through the codec, Hindi speech
+drifts 24% in ASR transcript versus 1% for English. Whatever the codec cannot encode, no generator on top of it can
+produce, so this is the ceiling on Hindi clarity and on how exactly a voice can be cloned. It is also the last
+piece of the pipeline that is not ours, and it puts every user through Kyutai's gate. The plan:
+- *C0 — scope:* audit open codec-training frameworks (`stable-audio-tools`, AudioCraft/EnCodec, DAC) against the
+  Pocket codec's shape (24 kHz, 12.5 frames/s, continuous 32-dim latents, small encoder/decoder Transformers); pick a
+  semantic-distillation target that knows Hindi (w2v-BERT 2.0 or IndicWav2Vec rather than WavLM).
+- *C1 — control:* fine-tune Mimi on Indian speech. Cheap, and it tells us how much of the Hindi loss is fixable.
+- *C2 — from scratch:* same architecture, random init, on a wideband pool of Hindi, Indian English and English.
+  16 kHz IndicVoices cannot teach a 24 kHz codec anything above 8 kHz, so this needs the 48 kHz sets (IndicVoices-R,
+  Rasa) plus HiFiTTS-2.
+- *C3 — gates:* beat Mimi's 24% Hindi drift while holding ~1% English; blind listening on Hindi phonetics,
+  code-switch points and speaker identity; and a *modellability* check — a small generator trained on the new latents
+  must reach the same WER as one trained on Mimi's, because a codec that reconstructs well but is hard to model is useless.
+- *C4 — adopt:* freeze it, recompute latents, retrain the teacher, re-distill Base and Lite. That release would be
+  trained from scratch end to end.
+
+**2. Cleaner, wider-band Hindi data.** Two-thirds of v0's audio is 16 kHz phone speech, which is why Hindi sounds
+duller than English and why our naturalness numbers were capped by the prompts rather than the model. IndicVoices-R
+and Rasa (48 kHz, AI4Bharat) are the obvious next sources; stricter filtering is the other half.
+
+**3. Speech we could not find in the open:** clause-level natural Hinglish, Indian-accented English, and children.
+v0's Hinglish is word-level switching reconstructed from IndicVoices annotations. Consented recordings from bilingual
+speakers are the only way to get the real thing.
+
+**4. Better voices.** Voice identity is v0's weakest point — the one human test rated a clone "70% there". Beyond
+codec and data, two things help: consented studio-quality preset voices (the reference clip sets the sound), and
+per-voice fine-tuning for the few voices a product actually ships, which is a much easier problem than zero-shot cloning.
+
+**5. Shorter schedules.** Every model in this project peaked early (teacher ~100k steps, students ~50–100k
+distillation steps) and got worse with more training on this corpus. v1 should early-stop on the benchmark and keep
+every checkpoint.
+
+**6. The missing measurements:** English WER on the LibriSpeech protocol (to compare with Kyutai's table),
+cross-language cloning at scale, long text / names / numbers, latency on a laptop CPU, and a proper human listening
+study. And a Hindi-native speaker-similarity model — the English-trained one we use compresses exactly the range
+listeners care about.
+
+Full checklist with status: [notes/roadmap.md](notes/roadmap.md).
 
 ## Acknowledgements
 
