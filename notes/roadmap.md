@@ -6,9 +6,9 @@ Living list of what comes after the running work. Plan: [plan.md](plan.md) · de
 ## Now — v0 family on the frozen Kyutai codec (in progress)
 
 - [x] Arm A `scratch_v0` ran to 400k (best at ~100–115k); Arm B `ftlang_v0` stopped at 115k; benchmarked every 25k steps.
-- [x] Teacher picked (115k scratch checkpoint, D21); Base (12L) and Lite (6L) distilling to 200k; benchmark all three on quality, cloning, latency/memory.
+- [x] Teacher picked (115k scratch checkpoint, D21); Base (12L) and Lite (6L) distilled to 200k; benchmark all three on quality, cloning, latency/memory.
 - [ ] Remaining plan §8 tests: cross-language cloning, long text / names / numbers, 5 s vs 10 s references, Lite on CPU.
-- [ ] Human listening pass on the three preset voices (male, female, kid).
+- [x] First human listening result: an unseen colleague's voice, "70% there, not an exact clone" (E8). Full listening pass still open.
 
 ## Published 2026-09-21 — v0 release
 
@@ -27,7 +27,7 @@ samples, roadmap, license. **Only after the results are out** (final benchmarks 
       whether to publish cloning-capable checkpoints at all vs preset-only voice states; re-read the accepted
       `kyutai/pocket-tts` terms for redistribution/use conditions; commit attribution rule for the public repo.
 - [x] Python API `jugnu_tts` (clone / speak / stream / save voices), pip-installable from the repo.
-- [ ] Replace the student weights with the final 200k checkpoints; re-benchmark; refresh page samples and tables.
+- [x] Students finished 200k; benchmarked; published 90k / 112.5k checkpoints kept (D29); tables updated.
 - [ ] Never push: dataset audio, Kyutai's gated weights, HF tokens, box address/keys.
 
 ## Next — own codec (deferred until v0 training completes; user decision 2026-09-19)

@@ -30,14 +30,22 @@ Benchmark: 20 held-out speakers never seen in training; the voice prompt is 5 s 
 same speaker; 150 Hindi + 150 Hinglish sentences; word error rate from IndicConformer-600M.
 
 ![The 6-layer student matches its 24-layer teacher](docs/figures/model_family.png)
-*The students match the teacher. The dashed line is the same ASR judge on the real recordings of these sentences —
+*The students match the teacher; the 12-layer Base has the best numbers of the three. The dashed line is the same ASR judge on the real recordings of these sentences —
 our clean synthetic speech is easier for it than noisy field audio, so read 9–14% as "at the judge's floor".*
 
 | Model | Hindi WER / CER | Hinglish WER / CER | Speaker similarity |
 | --- | --- | --- | --- |
 | Teacher 24L (115k steps, cfg 2.0) | 9.1% / 3.3% | 13.3% / 6.7% | 0.91 |
-| Base 12L (benchmarked at 60k distillation steps, still training) | 9.0% / 3.2% | 12.1% / 5.5% | 0.91 |
-| Lite 6L (benchmarked at 100k distillation steps, still training) | 9.0% / 3.2% | 12.2% / 5.2% | 0.91 |
+| Base 12L (released: 90k distillation steps) | 8.5% / 2.9% | 11.7% / 4.9% | 0.92 |
+| Lite 6L (released: 112.5k distillation steps) | 9.0% / 3.2% | 12.2% / 5.2% | 0.92 |
+| Base 12L at the end of its 200k run (not released) | 9.2% / 3.5% | 12.6% / 5.8% | 0.92 |
+| Lite 6L at the end of its 200k run (not released) | 9.0% / 3.5% | 12.1% / 5.7% | 0.92 |
+
+**What speaker similarity does and does not say.** The one human listening test so far — a colleague's voice,
+never in training, cloned from a 15 s phone recording — was rated *"70% there, but not an exact clone"*. That clone
+scores 0.95 on the same similarity metric, while the real speaker scores 0.987 against their own recording. The
+metric compresses exactly the range a listener cares about, so read 0.92 as "recognisably the right kind of voice",
+not as 92% of the way to the speaker. Voice identity is where v0 is weakest.
 
 **Not yet measured:** English WER, cross-language cloning at scale, long text / names / numbers, latency and CPU
 real-time factor, and any human listening test. Every number here comes from an automatic judge.
@@ -94,7 +102,7 @@ flowchart LR
 | Effective batch | 64 utterances (16 × 2 GPUs × 2 accumulation) | 64 (32 × 1 GPU × 2) | 64 (32 × 1 GPU × 2) |
 | Conditioning dropout (text / voice) | 0.2 / 0.2 | none | none |
 | Weight EMA | 0.999 | 0.9999 | 0.9999 |
-| Steps | 400k run; **115k released** | 200k planned (90k in this release) | 200k planned (112.5k in this release) |
+| Steps | 400k run; **115k released** | 200k run; **90k released** (best benchmark) | 200k run; **112.5k released** (best benchmark; 200k ties) |
 | Speed on RTX PRO 4500 Blackwell 32 GB | ~3.0 steps/s on 2 GPUs | ~2.5 steps/s on 1 GPU | ~3.2 steps/s on 1 GPU |
 | Wall-clock | ~11 h to 115k (~37 h to 400k) | ~22 h to 200k | ~17 h to 200k |
 | CPU speed (16 threads, standard runtime) | — | 1.5× real time | 3.3× real time |

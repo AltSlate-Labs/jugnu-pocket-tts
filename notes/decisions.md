@@ -172,3 +172,9 @@ standard PyPI `pocket-tts` runtime (tested against 3.1.0). Verified from a fresh
 speech in 1.3 s, first streamed chunk in 0.10 s, exact IndicConformer transcript. That fresh-install test caught one
 bug (wav writing imported `sphn`, which is not a PyPI `pocket-tts` dependency → now uses the standard library).
 Documented in README, the HF model card and the demo page.
+
+**D29. (2026-09-22) Published student weights stay at Base 90k / Lite 112.5k.** The 200k checkpoints benchmark no
+better (Lite tie; Base −0.7 / −0.9 pts), consistent with every model in this project peaking early on this corpus.
+Model card, README and demo page updated with the final trajectories and with the similarity-metric caveat from E8
+(a clone a listener rated "70% there" scores 0.95 where the real speaker scores 0.987). v1 recipe note: distill
+~100k steps or early-stop on the benchmark; keep every 25k checkpoint.

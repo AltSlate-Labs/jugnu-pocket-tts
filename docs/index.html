@@ -117,13 +117,14 @@
     <h2>How good is it?</h2>
     <p class="sub">Twenty speakers the models never trained on, 150 Hindi and 150 Hinglish sentences, voice prompt taken
       from a different utterance. Word error rate is measured by AI4Bharat's IndicConformer. The same recogniser scores
-      14.5% and 15.7% on the real recordings of these sentences, so 9–13% means "as clear as this judge can tell".</p>
+      14.5% and 15.7% on the real recordings of these sentences, so 9–13% means "as clear as this judge can tell". Speaker similarity is a coarse number: the one clone a human has
+      rated so far ("70% there, not exact") scores 0.95, where the real speaker scores 0.99 against their own recording.</p>
     <div class="tablewrap"><table>
       <thead><tr><th>Model</th><th class="num">Parameters</th><th class="num">Hindi WER</th><th class="num">Hinglish WER</th><th class="num">Speaker similarity</th></tr></thead>
       <tbody>
         <tr><td>Teacher, 24 layers</td><td class="num">316 M</td><td class="num">9.1%</td><td class="num">13.3%</td><td class="num">0.91</td></tr>
-        <tr><td>Base, 12 layers <span style="color:var(--ink-3)">(60k steps, still training)</span></td><td class="num">165 M</td><td class="num">9.0%</td><td class="num">12.1%</td><td class="num">0.91</td></tr>
-        <tr><td>Lite, 6 layers <span style="color:var(--ink-3)">(100k steps, still training)</span></td><td class="num">89 M</td><td class="num">9.0%</td><td class="num">12.2%</td><td class="num">0.91</td></tr>
+        <tr><td>Base, 12 layers</td><td class="num">165 M</td><td class="num">8.5%</td><td class="num">11.7%</td><td class="num">0.92</td></tr>
+        <tr><td>Lite, 6 layers</td><td class="num">89 M</td><td class="num">9.0%</td><td class="num">12.2%</td><td class="num">0.92</td></tr>
       </tbody></table></div>
     <figure><img src="figures/wer_vs_steps.png" alt="Line charts of word error rate against training steps for Hindi and Hinglish. The from-scratch teacher is best near 100 thousand steps and degrades to 14 and 19 percent by 400 thousand." loading="lazy">
       <figcaption>Training longer made the teacher worse on our noisy corpus, so we release the 115k-step checkpoint.

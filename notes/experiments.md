@@ -430,3 +430,72 @@ transcribed before publishing: students are near-exact on Hindi, numbers and hea
 
 Release staging: box `~/hindi-tts/hf_release/{teacher-24l,base-12l,lite-6l}` (FlowLM-only + `assemble.py`); local
 repo `~/Workspace/jugnu-pocket-tts` (committed locally, not pushed) with README, NOTICE, figures and `docs/` page.
+
+## E8 — first human listening result: a real unseen voice (2026-09-21, local only)
+
+A colleague read the cloning script into a phone (33 s, quiet: mean −34 dB; level-normalised and trimmed before use;
+reference UTMOS 1.42). All three models cloned it from the first 15 s over the 9 demo sentences. Nothing published.
+
+- Automatic: Hindi / Hinglish transcripts essentially exact in all three models (failures: `reschedule` in every
+  model; one `यहाँ हूँ`→`रहा हूं` in Base). Generated UTMOS 2.6–2.7. Clips are slow (5–7 s vs 3–4 s with LibriVox
+  voices): the model copied the careful reading pace.
+- **Human verdict (project owner): "70 percent there, but did not exactly clone it."**
+- Metric check against 13 s of the same recording the model never saw (wavlm-base-plus-sv): real-vs-real ceiling
+  **0.987**; clones **0.92–0.955**. Prompt length matters a little: first 5 s 0.924 → 15 s 0.950 → 20 s 0.955 (Lite,
+  temp 0.3), and worst-case clips improve more (min 0.81 → 0.92). Temperature 0.3 vs 0.7: no consistent effect.
+  Teacher and Lite are equally close.
+
+Reading: the similarity metric saturates — a clone a human hears as "70%" scores 0.95 where the true speaker scores
+0.987, so our benchmark's 0.91–0.92 must not be read as "92% of the way to the voice". The gap to identity is where
+v0 is weakest and the metric is least sensitive: fine timbre and prosody, limited by (a) the codec's loss on Indian
+speech, (b) 16 kHz noisy training audio, (c) a short, noisy prompt, (d) 115k steps on 647 h vs upstream's
+multi-thousand-hour corpora. Longer prompts help modestly; nothing at inference closes the gap.
+
+### E7 — Base 12L at 100k distillation steps
+
+| Set | IC WER | IC CER | Speaker sim | UTMOS | silent / no_eos |
+| --- | --- | --- | --- | --- | --- |
+| Hindi | 8.5% | 2.9% | 0.918 | 2.55 | 0 / 0 |
+| Hinglish | 11.7% | 4.9% | 0.911 | 2.41 | 0 / 0 |
+
+Best numbers of any model so far on both sets (teacher 9.1 / 13.3, Lite@100k 9.0 / 12.2), though the margins are
+inside the ±1 pt noise at n=150. First sign that the 12-layer Base buys something over Lite.
+
+### E7 — Lite 6L at 150k distillation steps
+
+| Set | IC WER | IC CER | Speaker sim | UTMOS | silent / no_eos |
+| --- | --- | --- | --- | --- | --- |
+| Hindi | 9.1% | 3.3% | 0.920 | 2.55 | 0 / 0 |
+| Hinglish | 13.1% | 6.6% | 0.906 | 2.41 | 0 / 0 |
+
+Lite by step (Hindi / Hinglish IC WER): 50k 8.4 / 12.1 · 100k 9.0 / 12.2 · 150k 9.1 / 13.1. Still at teacher level
+(9.1 / 13.3) but not improving with more distillation; Hinglish +0.9 pt since 100k is within noise but the direction
+matches what the teacher did with longer training. Choose the released Lite checkpoint by benchmark, not by step.
+
+### E7 — Base 12L at 150k distillation steps
+
+| Set | IC WER | IC CER | Speaker sim | UTMOS | silent / no_eos |
+| --- | --- | --- | --- | --- | --- |
+| Hindi | 9.1% | 3.5% | 0.920 | 2.52 | 0 / 0 |
+| Hinglish | 13.9% | 6.6% | 0.908 | 2.39 | 0 / 0 |
+
+Base by step (Hindi / Hinglish IC WER): 60k 9.0 / 12.1 · 100k 8.5 / 11.7 · 150k 9.1 / 13.9. Same shape as Lite
+(50k 8.4 / 12.1 · 100k 9.0 / 12.2 · 150k 9.1 / 13.1) and as the teacher: on this data the best checkpoint is early
+(~50–100k distillation steps) and Hinglish drifts up by 1–2 pts afterwards. The published checkpoints (Base 90k,
+Lite 112.5k) sit in the good region; the 200k weights will only replace them if they benchmark better.
+Lesson for v1: distill for ~100k steps (or early-stop on the benchmark) and keep every 25k checkpoint.
+
+### E7 final — both students reached 200k (Lite 18:49 UTC, Base 23:13 UTC, 21 Sep 2026)
+
+| Model | Hindi IC WER / CER | Hinglish IC WER / CER | Speaker sim (Hi / Mix) | UTMOS (Hi / Mix) |
+| --- | --- | --- | --- | --- |
+| Lite 6L @ 200k | 9.0% / 3.5% | 12.1% / 5.7% | 0.920 / 0.914 | 2.51 / 2.39 |
+| Lite 6L @ 112.5k (published; benchmarked at 100k) | 9.0% / 3.2% | 12.2% / 5.2% | 0.916 / 0.913 | 2.54 / 2.39 |
+| Base 12L @ 200k | 9.2% / 3.5% | 12.6% / 5.8% | 0.917 / 0.913 | 2.54 / 2.40 |
+| Base 12L @ 90k (published; benchmarked at 100k) | 8.5% / 2.9% | 11.7% / 4.9% | 0.918 / 0.911 | 2.55 / 2.41 |
+
+Full trajectories (Hindi / Hinglish IC WER): Lite 50k 8.4/12.1 · 100k 9.0/12.2 · 150k 9.1/13.1 · 200k 9.0/12.1;
+Base 60k 9.0/12.1 · 100k 8.5/11.7 · 150k 9.1/13.9 · 200k 9.2/12.6. Lite@200k ties the published checkpoint; Base@200k
+is slightly behind its published 90k (same early-peak pattern as the teacher). **Published weights kept** (decision:
+replace only on a better score). 200k checkpoints archived in `final_v0/{lite6,base12}_00200000.pt`. Both runs: one
+attempt, no restarts. GPUs released 23:13 UTC.

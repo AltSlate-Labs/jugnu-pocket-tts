@@ -104,11 +104,17 @@ similarity is WavLM-base-plus-sv cosine (English-trained, unvalidated on Hindi).
 | Model | Hindi WER / CER | Hinglish WER / CER | Speaker sim | UTMOS (noisy prompts) |
 | --- | --- | --- | --- | --- |
 | Teacher 24L (115k steps, cfg 2.0) | 9.1% / 3.3% | 13.3% / 6.7% | 0.91 | 2.5 / 2.3 |
-| Base 12L (90k distillation steps; benchmarked at 60k) | 9.0% / 3.2% | 12.1% / 5.5% | 0.91 | 2.6 / 2.4 |
-| Lite 6L (112.5k distillation steps; benchmarked at 100k) | 9.0% / 3.2% | 12.2% / 5.2% | 0.91 | 2.5 / 2.4 |
+| Base 12L (90k distillation steps) | 8.5% / 2.9% | 11.7% / 4.9% | 0.92 | 2.6 / 2.4 |
+| Lite 6L (112.5k distillation steps) | 9.0% / 3.2% | 12.2% / 5.2% | 0.92 | 2.5 / 2.4 |
 
-Both students are still training to 200k steps; final weights will replace these. On a 16-thread CPU in the standard
-runtime, Lite runs at 3.3× real time and Base at 1.5×.
+Both students were distilled for 200k steps; the released checkpoints are the ones that benchmarked best (the 200k
+weights tie or score slightly lower — every model in this project peaked early on this noisy corpus). On 16 threads
+of a server CPU in the standard runtime, Lite runs at 3.3× real time and Base at 1.5×.
+
+**On the similarity number:** the one human listening test so far (a colleague's voice, never in training, cloned
+from a 15 s phone recording) was rated "70% there, but not an exact clone". That clone scores 0.95 on this metric
+while the real speaker scores 0.987 against their own recording, so 0.92 means "recognisably the right kind of
+voice", not 92% of the way to the speaker. Voice identity is v0's weakest point.
 
 Not yet measured: English WER, cross-language cloning at scale, long text / names / numbers, latency and CPU
 real-time factor, any human listening test.
@@ -140,7 +146,7 @@ real-time factor, any human listening test.
 | Effective batch | 64 utterances (16 × 2 GPUs × 2 accumulation) | 64 (32 × 1 GPU × 2) | 64 (32 × 1 GPU × 2) |
 | Conditioning dropout (text / voice) | 0.2 / 0.2 | none | none |
 | Weight EMA | 0.999 | 0.9999 | 0.9999 |
-| Steps | 400k run; **115k released** | 200k planned (90k in this release) | 200k planned (112.5k in this release) |
+| Steps | 400k run; **115k released** | 200k run; **90k released** | 200k run; **112.5k released** |
 | Speed on RTX PRO 4500 Blackwell 32 GB | ~3.0 steps/s on 2 GPUs | ~2.5 steps/s on 1 GPU | ~3.2 steps/s on 1 GPU |
 | Wall-clock | ~11 h to 115k (~37 h to 400k) | ~22 h to 200k | ~17 h to 200k |
 | CPU speed (16 threads, standard runtime) | — | 1.5× real time | 3.3× real time |

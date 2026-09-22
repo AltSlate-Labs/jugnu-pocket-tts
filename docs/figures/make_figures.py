@@ -37,7 +37,7 @@ fig.tight_layout(rect=(0, 0, 1, 0.94)); fig.savefig("docs/figures/wer_vs_steps.p
 
 # 2. Model family ---------------------------------------------------------------------------------------------------
 models = ["Teacher\n24 layers · 316M", "Base\n12 layers · 165M", "Lite\n6 layers · 89M"]
-wer = {"Hindi": [9.1, 9.0, 9.0], "Hinglish": [13.3, 12.1, 12.2]}
+wer = {"Hindi": [9.1, 8.5, 9.0], "Hinglish": [13.3, 11.7, 12.2]}
 fig, axes = plt.subplots(1, 2, figsize=(10, 3.6), sharey=True)
 for ax, lang in zip(axes, ("Hindi", "Hinglish")):
     style(ax)
@@ -49,7 +49,7 @@ for ax, lang in zip(axes, ("Hindi", "Hinglish")):
     ax.set_title(lang, loc="left", color=INK, fontsize=11, fontweight="bold"); ax.set_ylim(0, 18)
 axes[0].set_ylabel("word error rate, %")
 fig.suptitle("The 6-layer student matches its 24-layer teacher", x=0.01, ha="left", color=INK, fontsize=12.5, fontweight="bold")
-fig.text(0.01, 0.005, "Held-out speakers, 150 sentences per set. Students: Base at 60k, Lite at 100k distillation steps (still training).",
+fig.text(0.01, 0.005, "Held-out speakers, 150 sentences per set. Released checkpoints: Base at 90k and Lite at 112.5k distillation steps.",
          color=MUTED, fontsize=8.5)
 fig.tight_layout(rect=(0, 0.04, 1, 0.93)); fig.savefig("docs/figures/model_family.png", dpi=150); plt.close(fig)
 
