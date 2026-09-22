@@ -102,7 +102,7 @@ flowchart LR
 | Effective batch | 64 utterances (16 × 2 GPUs × 2 accumulation) | 64 (32 × 1 GPU × 2) | 64 (32 × 1 GPU × 2) |
 | Conditioning dropout (text / voice) | 0.2 / 0.2 | none | none |
 | Weight EMA | 0.999 | 0.9999 | 0.9999 |
-| Steps | 400k run; **115k released** | 200k run; **90k released** (best benchmark) | 200k run; **112.5k released** (best benchmark; 200k ties) |
+| Steps | 400k run; **115k released** (exact: EMA weights at step 115,192, where the run was stopped) | 200k run; **90k released** (best benchmark) | 200k run; **112.5k released** (best benchmark; 200k ties) |
 | Speed on RTX PRO 4500 Blackwell 32 GB | ~3.0 steps/s on 2 GPUs | ~2.5 steps/s on 1 GPU | ~3.2 steps/s on 1 GPU |
 | Wall-clock | ~11 h to 115k (~37 h to 400k) | ~22 h to 200k | ~17 h to 200k |
 | CPU speed (16 threads, standard runtime) | — | 1.5× real time | 3.3× real time |
